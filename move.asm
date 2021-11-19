@@ -38,7 +38,7 @@ movwf COUNTERX
     movlw b'10000000'
     movwf PACMANY
     movlw b'00001111'
-    movwf PACMANX ;initialize pacman position
+    movwf PACMANX ;initialize pac-man position
 
 StageSelection:
 	CALL StageSelectScreen
