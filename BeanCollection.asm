@@ -1,35 +1,35 @@
-LIST P=18F4520
-#include <P18F4520.INC>
-CONFIG OSC = XT
-CONFIG WDT = OFF
-CONFIG LVP = OFF
-CBLOCK 0x000
-DELAY_U
-DELAY_H
-DELAY_L
-PACMANX 
-PACMANY
-COUNTERY
-COUNTERX
-BeanLeft
-ENDC
+	LIST P=18F4520
+	#include <P18F4520.INC>
+	CONFIG OSC = XT
+	CONFIG WDT = OFF
+	CONFIG LVP = OFF
+	CBLOCK 0x000
+	DELAY_U
+	DELAY_H
+	DELAY_L
+	PACMANX 
+	PACMANY
+	COUNTERY
+	COUNTERX
+	BeanLeft
+	ENDC
 
-ORG 0x0000
-goto main
-
-ORG 0x0100
+	ORG 0x0000
+	goto main
+	
+	ORG 0x0100
 
 main: 
-movlw 0x0F
-movwf ADCON1
-clrf TRISC
-clrf TRISD ;CD = output
-Setf TRISB ;B = input
-movlw 0x00
-movwf COUNTERY
-movlw 0x09
-movwf COUNTERX
-setf BeanLeft
+	movlw 0x0F
+	movwf ADCON1
+	clrf TRISC
+	clrf TRISD ;CD = output
+	Setf TRISB ;B = input
+	movlw 0x00
+	movwf COUNTERY
+	movlw 0x09
+	movwf COUNTERX
+	setf BeanLeft
 
 
     movlw b'10000000'
@@ -39,13 +39,10 @@ setf BeanLeft
 
 MOVE:    ;if(player.posx == finishptx && player.posy == finishpty)
     ;endgame
-    movlw b'00000001'
-    CPFSEQ PACMANY ;check if player at finish point 1
-    GOTO GAME ;not at finish point, continue game
-    movlw B'00010000'
-    CPFSEQ PACMANX ;check if player at finish point 2
-    GOTO GAME ;not at finish point, continue game
-    GOTO GAMEOVER ;winning, game end
+    movlw 0
+	CPFSEQ BeanLeft
+	GOTO GAME
+	GOTO GAMEOVER
 
 GAME:
 	
@@ -61,7 +58,7 @@ GAME:
 MOVEUPYES:
     btfss PORTB, 0x01 ;button P2
     CALL moveup ;move up
-    NOMOVEUP: 
+NOMOVEUP: 
 ;movedown?
     MOVF COUNTERY
     BZ NOMOVEDOWN ;if pointer = 0, even pressed, no movedown
@@ -88,37 +85,116 @@ NOMOVERIGHT:
 	CALL Bean
 	GOTO MOVE 
 	
-
+;bean subroutine start
+;-------------------------------------------
 
 Bean:
 	btfss BeanLeft, 0 ;check bean1
-	GOTO Bean1No
-	
+	GOTO Bean1No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
 	GOTO continue1;Not Same
 	btfss PACMANY,0
 	GOTO continue1;Not Same	
-Bean1No:
+Bean1No: ;XY = 1, bean = eaten
 	BCF BeanLeft, 0
-continue1
+
+continue1:
+	btfss BeanLeft, 1 ;check bean1
+	GOTO Bean2No	
+	movlw b'00010100'
+	CPFSEQ PACMANX
+	GOTO continue2;Not Same
+	btfss PACMANY,1
+	GOTO continue2;Not Same	
+Bean2No:
+	BCF BeanLeft, 1
+
+continue2:
+	btfss BeanLeft, 2 ;check bean1
+	GOTO Bean3No	
+	movlw b'00010100'
+	CPFSEQ PACMANX
+	GOTO continue3;Not Same
+	btfss PACMANY,2
+	GOTO continue3;Not Same	
+Bean3No:
+	BCF BeanLeft, 2
+
+continue3:
+	btfss BeanLeft, 3 ;check bean1
+	GOTO Bean4No	
+	movlw b'00010100'
+	CPFSEQ PACMANX
+	GOTO continue4;Not Same
+	btfss PACMANY,3
+	GOTO continue4;Not Same	
+Bean4No:
+	BCF BeanLeft, 3
+
+	
+continue4:
+
+	btfss BeanLeft, 4 ;check bean1
+	GOTO Bean5No	
+	movlw b'00010100'
+	CPFSEQ PACMANX
+	GOTO continue5;Not Same
+	btfss PACMANY,4
+	GOTO continue5;Not Same	
+Bean5No:
+	BCF BeanLeft, 4
+
+continue5:
+	btfss BeanLeft, 5 ;check bean1
+	GOTO Bean6No	
+	movlw b'00010100'
+	CPFSEQ PACMANX
+	GOTO continue6;Not Same
+	btfss PACMANY,5
+	GOTO continue6;Not Same	
+Bean6No:
+	BCF BeanLeft, 5
+
+continue6:
+	btfss BeanLeft, 6 ;check bean1
+	GOTO Bean7No	
+	movlw b'00010100'
+	CPFSEQ PACMANX
+	GOTO continue7;Not Same
+	btfss PACMANY,6
+	GOTO continue7;Not Same	
+Bean7No:
+	BCF BeanLeft, 6
+
+continue7:
+	btfss BeanLeft, 7 ;check bean1
+	GOTO Bean8No	
+	movlw b'00010100'
+	CPFSEQ PACMANX
+	GOTO continue8;Not Same
+	btfss PACMANY,7
+	GOTO continue8;Not Same	
+Bean8No:
+	BCF BeanLeft, 7
+
+continue8:
 	movlw b'00010100'
 	movwf PORTD
 	movff BeanLeft, PORTC
 	CALL Delay2
 	
-return
+	return
 
-
+;-------------------------------------------
 
 
 
 
 
 GAMEOVER: 
-clrf PORTC
-clrf PORTD 
-GOTO GAMEOVER ;end game
+	CALL GameOverScreen 
+	GOTO GAMEOVER ;end game
 
 
 Delay: 
@@ -139,7 +215,7 @@ Delay:
 Delay2: 
     movlw 0x1
     movwf DELAY_U
-    LOP_11: movlw 0xFF
+    LOP_11: movlw 0xF
     movwf DELAY_H
     LOP_22: movlw 0xF
     movwf DELAY_L
@@ -215,13 +291,113 @@ moveleft:
     TBLRD* ;increase pointer first then read
     MOVFF TABLAT, PACMANX ;X-1
     return
+GameOverScreen:
+	movlw B'11111110'
+	movwf PORTC
+	movlw B'00010000'
+	movwf PORTD
+	CALL Delay2
 
-ORG 0x2500
+	movlw B'10000010'
+	movwf PORTC
+	movlw B'00010001'
+	movwf PORTD
+	CALL Delay2
+	
+	
+	movlw B'10000010'
+	movwf PORTC
+	movlw B'00010010'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'10000010'
+	movwf PORTC
+	movlw B'00010011'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'10010010'
+	movwf PORTC
+	movlw B'00010100'
+	movwf PORTD
+	CALL Delay2
+	
+	movlw B'11110010'
+	movwf PORTC
+	movlw B'00010101'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'00010010'
+	movwf PORTC
+	movlw B'00010110'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'00000000'
+	movwf PORTC
+	movlw B'00010111'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'11111110'
+	movwf PORTC
+	movlw B'00001000'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'10000010'
+	movwf PORTC
+	movlw B'00001001'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'10000010'
+	movwf PORTC
+	movlw B'00001010'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'10000010'
+	movwf PORTC
+	movlw B'00001011'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'10010010'
+	movwf PORTC
+	movlw B'00001100'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'11110010'
+	movwf PORTC
+	movlw B'00001101'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'00010010'
+	movwf PORTC
+	movlw B'00001110'
+	movwf PORTD
+	CALL Delay2
+
+	movlw B'00000000'
+	movwf PORTC
+	movlw B'00001111'
+	movwf PORTD
+	CALL Delay2
+	;Game Over Screen End
+	return
+
+	ORG 0x2500
 moveY_TABLE:
     DB B'10000000', B'01000000', B'00100000',B'00010000', B'00001000', B'00000100',B'00000010', B'00000001' ;lowest to largest
 
 
-ORG 0x2600
+	ORG 0x2600
 moveX_TABLE:
     DB B'00010000',B'00010001',B'00010010',B'00010011',B'00010100',B'00010101',B'00010110',B'00010111',B'00001000',B'00001001',B'00001010',B'00001011',B'00001100',B'00001101',B'00001110',B'00001111'
-END
+
+	END
