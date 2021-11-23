@@ -11,7 +11,8 @@
 	PACMANY
 	COUNTERY
 	COUNTERX
-	BeanLeft
+	Bean1Left
+	Bean2Left
 	ENDC
 
 	ORG 0x0000
@@ -29,8 +30,9 @@ main:
 	movwf COUNTERY
 	movlw 0x09
 	movwf COUNTERX
-	setf BeanLeft
-
+	setf Bean1Left
+	movlw b'00100100'
+	movwf Bean2Left
 
     movlw b'10000000'
     movwf PACMANY
@@ -40,7 +42,9 @@ main:
 MOVE:    ;if(player.posx == finishptx && player.posy == finishpty)
     ;endgame
     movlw 0
-	CPFSEQ BeanLeft
+	CPFSEQ Bean1Left
+	GOTO GAME
+	CPFSEQ Bean2Left
 	GOTO GAME
 	GOTO GAMEOVER
 
@@ -89,7 +93,7 @@ NOMOVERIGHT:
 ;-------------------------------------------
 
 Bean:
-	btfss BeanLeft, 0 ;check bean1
+	btfss Bean1Left, 0 ;check bean1
 	GOTO Bean1No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -97,10 +101,10 @@ Bean:
 	btfss PACMANY,0
 	GOTO continue1;Not Same	
 Bean1No: ;XY = 1, bean = eaten
-	BCF BeanLeft, 0
+	BCF Bean1Left, 0
 
 continue1:
-	btfss BeanLeft, 1 ;check bean1
+	btfss Bean1Left, 1 ;check bean1
 	GOTO Bean2No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -108,10 +112,10 @@ continue1:
 	btfss PACMANY,1
 	GOTO continue2;Not Same	
 Bean2No:
-	BCF BeanLeft, 1
+	BCF Bean1Left, 1
 
 continue2:
-	btfss BeanLeft, 2 ;check bean1
+	btfss Bean1Left, 2 ;check bean1
 	GOTO Bean3No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -119,10 +123,10 @@ continue2:
 	btfss PACMANY,2
 	GOTO continue3;Not Same	
 Bean3No:
-	BCF BeanLeft, 2
+	BCF Bean1Left, 2
 
 continue3:
-	btfss BeanLeft, 3 ;check bean1
+	btfss Bean1Left, 3 ;check bean1
 	GOTO Bean4No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -130,12 +134,12 @@ continue3:
 	btfss PACMANY,3
 	GOTO continue4;Not Same	
 Bean4No:
-	BCF BeanLeft, 3
+	BCF Bean1Left, 3
 
 	
 continue4:
 
-	btfss BeanLeft, 4 ;check bean1
+	btfss Bean1Left, 4 ;check bean1
 	GOTO Bean5No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -143,10 +147,10 @@ continue4:
 	btfss PACMANY,4
 	GOTO continue5;Not Same	
 Bean5No:
-	BCF BeanLeft, 4
+	BCF Bean1Left, 4
 
 continue5:
-	btfss BeanLeft, 5 ;check bean1
+	btfss Bean1Left, 5 ;check bean1
 	GOTO Bean6No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -154,10 +158,10 @@ continue5:
 	btfss PACMANY,5
 	GOTO continue6;Not Same	
 Bean6No:
-	BCF BeanLeft, 5
+	BCF Bean1Left, 5
 
 continue6:
-	btfss BeanLeft, 6 ;check bean1
+	btfss Bean1Left, 6 ;check bean1
 	GOTO Bean7No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -165,10 +169,10 @@ continue6:
 	btfss PACMANY,6
 	GOTO continue7;Not Same	
 Bean7No:
-	BCF BeanLeft, 6
+	BCF Bean1Left, 6
 
 continue7:
-	btfss BeanLeft, 7 ;check bean1
+	btfss Bean1Left, 7 ;check bean1
 	GOTO Bean8No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -176,14 +180,39 @@ continue7:
 	btfss PACMANY,7
 	GOTO continue8;Not Same	
 Bean8No:
-	BCF BeanLeft, 7
+	BCF Bean1Left, 7	
 
 continue8:
+	btfss Bean2Left, 2 ;check bean
+	GOTO Bean9No	
+	movlw b'00010010'
+	CPFSEQ PACMANX
+	GOTO continue9;Not Same
+	btfss PACMANY,2
+	GOTO continue9;Not Same	
+Bean9No:
+	BCF Bean2Left, 2
+
+continue9:
+	btfss Bean2Left, 5 ;check bean
+	GOTO Bean10No	
+	movlw b'00010010'
+	CPFSEQ PACMANX
+	GOTO finish;Not Same
+	btfss PACMANY,5
+	GOTO finish;Not Same
+Bean10No:
+	BCF Bean2Left, 5	
+finish:
 	movlw b'00010100'
 	movwf PORTD
-	movff BeanLeft, PORTC
+	movff Bean1Left, PORTC
 	CALL Delay2
 	
+	movlw b'00010010'
+	movwf PORTD
+	movff Bean2Left, PORTC
+	CALL Delay2
 	return
 
 ;-------------------------------------------
