@@ -73,7 +73,9 @@ StageSelection:
 	CALL Delay
 	GOTO StageSelection
 
-
+;Level 1
+;------------------------------------------
+	
 MOVE1:   
 	;if(player.posx == finishptx && player.posy == finishpty)
     ;endgame
@@ -115,6 +117,10 @@ GAME1:
     GOTO MOVE1 
 ;game1 end
 
+;------------------------------------------    
+
+;Level2
+;------------------------------------------
 MOVE2:
 	
 	
@@ -152,7 +158,12 @@ GAME2:
 	CALL PacManMoveSet
 	CALL GhostMoving
     GOTO MOVE2
-	
+    ;Level2 end
+;------------------------------------------
+    
+   
+    ;GameOver
+;------------------------------------------
 GAMEOVER:
 BCF INTCON, GIE ;global enable OFF (pause is not allowed)
 CALL GameOverScreen 
@@ -161,6 +172,7 @@ GOTO main
 btfss PORTB, 7
 GOTO main
 GOTO GAMEOVER ;end game
+;------------------------------------------
 
 ;main program end
 ;--------------------------------------------------------------------------
@@ -169,12 +181,12 @@ GOTO GAMEOVER ;end game
 ;--------------------------------------------------------------------------
 pause:
 	ORG 300H
-	CALL PauseScreen
-	btfsc PORTB, 2
+	CALL PauseScreen ;Show 'PAUSE' on the LED matrix
+	btfsc PORTB, 2 ;if B3 is pressed, pause will be ended
 	bra pause
-	BCF INTCON, INT0IF
+	BCF INTCON, INT0IF ;clear flag bit
 	
-	RETFIE
+	RETFIE ;return from interupt
 ;--------------------------------------------------------------------------
 
 
@@ -189,17 +201,17 @@ GhostMoving:
 	
  
 	btfsc GHOSTY,7
-	BTG ToggleBit,0
+	BTG ToggleBit,0 ;if bit 7 = 1, invert toggle bit -> start go down
 	btfsc GHOSTY,0
-	BTG ToggleBit,0
+	BTG ToggleBit,0 ;if bit 0 = 1, inver toggle bit -> start go up
 	btfsc ToggleBit,0 ;ToggleBit test:
-	bra GoUp		;=1 -> go up
-	bra GoDown		;=0 -> go down
+	bra GoUp		;toggle=1 -> go up
+	bra GoDown		;toogle=0 -> go down
 GoUp:
-	RRNCF GHOSTY, 1
+	RRNCF GHOSTY, 1 ;shift right = go up
 	return
 GoDown:
-	RLNCF GHOSTY, 1
+	RLNCF GHOSTY, 1 ;shift left = go down
 	return
 
 ;Ghost moving end
@@ -215,19 +227,19 @@ PacManMoveSet:
     GOTO MOVEUPYES ;case: COUNTERY != 7
     GOTO NOMOVEUP    ;if pointer = 7, even pressed, no moveup
 MOVEUPYES:
-    btfss PORTB, 0x01 ;button P2
+    btfss PORTB, 0x01 ;button P2 pressed, try to move up
     CALL moveup ;move up
     NOMOVEUP: 
 ;movedown?
     MOVF COUNTERY
     BZ NOMOVEDOWN ;if pointer = 0, even pressed, no movedown
-    btfss PORTB, 0x05 ;button P6
+    btfss PORTB, 0x05 ;button P6 pressed, try to move down
     CALL movedown
 NOMOVEDOWN:
 ;moveleft?	
 	MOVF COUNTERX
 	BZ NOMOVELEFT ;Status = 0 (which means Counter=0, do nothing)
-    btfss PORTB, 0x04 ;button P5
+    btfss PORTB, 0x04 ;button P5 pressed, try to move left
     CALL moveleft
 NOMOVELEFT:
 ;moveright?	
@@ -236,7 +248,7 @@ NOMOVELEFT:
 	GOTO MOVERIGHTYES
 	GOTO NOMOVERIGHT
 MOVERIGHTYES:
-	btfss PORTB, 0x06 ;button P7
+	btfss PORTB, 0x06 ;button P7 pressed, try to move right
     CALL moveright
     
 NOMOVERIGHT:
@@ -488,6 +500,8 @@ EncountingWallLeft2:
 ;move left function end
 ;--------------------------------------------------------------------------
 
+	
+	
 ;--------------------------------------------------------------------------
 ;Display scrren function
 Maze1:
@@ -692,7 +706,7 @@ movlw B'00000000'
 	;maze2 end
 	return
 
-
+;------------------------------------------
 GameOverScreen:
 	movlw B'11111110'
 	movwf PORTC
@@ -793,7 +807,7 @@ movlw B'00000000'
 	;Game Over Screen End
 	return
 
-
+;------------------------------------------
 PauseScreen:
 	movlw B'01111110'
 	movwf PORTC
@@ -891,9 +905,9 @@ movlw B'00000000'
 	movlw B'00001111'
 	movwf PORTD
 	CALL Delay
-	;Stage Select Screen end
+	;Pause Screen end
 	return
-
+;------------------------------------------
 StageSelectScreen:
 	movlw B'01111100'
 	movwf PORTC
@@ -993,6 +1007,7 @@ movlw B'01000000'
 	CALL Delay
 	;Pause Screen end
 	return
+	
 ;Display Screen end
 ;--------------------------------------------------------------------------
 
@@ -1044,7 +1059,7 @@ Delay3:
 ;Delay function end
 ;--------------------------------------------------------------------------
 
-
+;------------------------------------------
 ORG 0x2500 ;lookup table for pacman vertical movement
 moveY_TABLE:
     DB B'10000000', B'01000000', B'00100000',B'00010000', B'00001000', B'00000100',B'00000010', B'00000001' ;lowest to largest
@@ -1063,3 +1078,4 @@ mazeY_TABLE2:
 	DB B'11111100',B'00000001',B'01111101',B'01111101',B'00000001',B'01111101',B'01111101',B'00000001',B'01111011',B'01111011',B'00000000',B'01111110',B'01111110',B'00000000',B'10110111',B'00000000'
 	
 END
+;------------------------------------------
