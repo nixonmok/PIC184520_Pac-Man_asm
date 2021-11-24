@@ -42,11 +42,11 @@ main:
 MOVE:    ;if(player.posx == finishptx && player.posy == finishpty)
     ;endgame
     movlw 0
-	CPFSEQ Bean1Left
+	CPFSEQ Bean1Left ;1column bean all eaten
 	GOTO GAME
-	CPFSEQ Bean2Left
+	CPFSEQ Bean2Left ;2column bean all eaten
 	GOTO GAME
-	GOTO GAMEOVER
+	GOTO GAMEOVER ;satisfy above condition = winning
 
 GAME:
 	
@@ -86,14 +86,14 @@ MOVERIGHTYES:
 NOMOVERIGHT:
 
     
-	CALL Bean
-	GOTO MOVE 
+	CALL Bean ;updating and show bean
+	GOTO MOVE ;loop the game
 	
 ;bean subroutine start
 ;-------------------------------------------
 
 Bean:
-	btfss Bean1Left, 0 ;check bean1
+	btfss Bean1Left, 0 ;check 1cloumn bean
 	GOTO Bean1No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -104,7 +104,7 @@ Bean1No: ;XY = 1, bean = eaten
 	BCF Bean1Left, 0
 
 continue1:
-	btfss Bean1Left, 1 ;check bean1
+	btfss Bean1Left, 1 
 	GOTO Bean2No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -115,7 +115,7 @@ Bean2No:
 	BCF Bean1Left, 1
 
 continue2:
-	btfss Bean1Left, 2 ;check bean1
+	btfss Bean1Left, 2 
 	GOTO Bean3No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -126,7 +126,7 @@ Bean3No:
 	BCF Bean1Left, 2
 
 continue3:
-	btfss Bean1Left, 3 ;check bean1
+	btfss Bean1Left, 3 
 	GOTO Bean4No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -139,7 +139,7 @@ Bean4No:
 	
 continue4:
 
-	btfss Bean1Left, 4 ;check bean1
+	btfss Bean1Left, 4 
 	GOTO Bean5No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -150,7 +150,7 @@ Bean5No:
 	BCF Bean1Left, 4
 
 continue5:
-	btfss Bean1Left, 5 ;check bean1
+	btfss Bean1Left, 5 
 	GOTO Bean6No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -161,7 +161,7 @@ Bean6No:
 	BCF Bean1Left, 5
 
 continue6:
-	btfss Bean1Left, 6 ;check bean1
+	btfss Bean1Left, 6 
 	GOTO Bean7No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -172,7 +172,7 @@ Bean7No:
 	BCF Bean1Left, 6
 
 continue7:
-	btfss Bean1Left, 7 ;check bean1
+	btfss Bean1Left, 7 
 	GOTO Bean8No	
 	movlw b'00010100'
 	CPFSEQ PACMANX
@@ -183,7 +183,7 @@ Bean8No:
 	BCF Bean1Left, 7	
 
 continue8:
-	btfss Bean2Left, 2 ;check bean
+	btfss Bean2Left, 2 ;check 2column bean
 	GOTO Bean9No	
 	movlw b'00010010'
 	CPFSEQ PACMANX
